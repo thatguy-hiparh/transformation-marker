@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 /**************** BPM Tapper ****************/ 
 function BpmTapper() {
   const [taps, setTaps] = useState<number[]>([]);
-  const [bpm, setBpm] = useState(null);
+  const [bpm, setBpm] = useState<number | null>(null);
 
   const tap = () => {
     const now = Date.now();
