@@ -78,22 +78,18 @@ export default function TransformationMarkerApp() {
 
   useEffect(() => {
     const st = document.createElement('style');
-    st.textContent = `
-      @keyframes fade-in { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }
-      .hide-scrollbar::-webkit-scrollbar { width: 0; height: 0; }
-      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      body { background: #1E1E2F; }
-      .animate-fade-in { animation: fade-in .3s ease-out; }
-    `;
+    st.textContent = `@keyframes fade-in{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
+  .hide-scrollbar::-webkit-scrollbar{width:0;height:0;}
+  .hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
+  body{background:#1E1E2F;}
+  .animate-fade-in{animation:fade-in .3s ease-out;}`;
     document.head.appendChild(st);
-  
-    // ✅ this is the correct return value
     return () => {
-      if (document.head.contains(st)) {
-        document.head.removeChild(st);
+      if (st && st.parentNode) {
+        st.parentNode.removeChild(st);
       }
     };
-  }, []);  
+  }, []);    
 
   const format = (s: number): string =>
     `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
