@@ -2,6 +2,14 @@
 
 import { useState, useEffect } from "react";
 
+interface Marker {
+  id: number;
+  time: number;
+  track: string;
+  label: string;
+  note: string;
+}
+
 /**************** BPM Tapper ****************/
 function BpmTapper() {
   const [taps, setTaps] = useState<number[]>([]);
@@ -62,14 +70,6 @@ function DurationCalculator() {
 }
 
 /**************** Main App *******************/
-interface Marker {
-  id: number;
-  time: number;
-  track: string;
-  label: string;
-  note: string;
-}
-
 export default function TransformationMarkerApp() {
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [hoverTime, setHoverTime] = useState<number | null>(null);
@@ -78,13 +78,13 @@ export default function TransformationMarkerApp() {
 
   useEffect(() => {
     const st = document.createElement('style');
-    st.textContent = `@keyframes fade-in{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
-.hide-scrollbar::-webkit-scrollbar{width:0;height:0;}
-.hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
-body{background:#1E1E2F;}
-.animate-fade-in{animation:fade-in .3s ease-out;}`;
+    st.textContent = `@keyframes fade-in{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}} .hide-scrollbar::-webkit-scrollbar{width:0;height:0;} .hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none;} body{background:#1E1E2F;} .animate-fade-in{animation:fade-in .3s ease-out;}`;
     document.head.appendChild(st);
-    return () => document.head.removeChild(st);
+    return () => {
+      if (st.parentNode) {
+        document.head.removeChild(st);
+      }
+    };
   }, []);
 
   const format = (s: number): string =>
@@ -135,7 +135,7 @@ body{background:#1E1E2F;}
                   setHoverX(e.clientX - left);
                   setHoverTime(Math.round((e.clientX - left) / width * timelineLength));
                 }}
-                onMouseLeave={() => { setHoverTime(null); }}
+                onMouseLeave={() => setHoverTime(null)}
               >
                 {ticks.filter(t => t % 10 === 0).map(t => (
                   <div key={t} className={`absolute top-0 ${t % 60 === 0 ? 'h-full bg-[#8EBBFF]' : 'h-4 bg-[#4A4D60]'} w-px`} style={{ left: `${t / 600 * 100}%` }} />
@@ -146,7 +146,7 @@ body{background:#1E1E2F;}
                 {markers.filter(m => m.track === track).map(m => (
                   <div key={m.id} className="absolute top-0 h-8 w-[2px] bg-[#FF6B6B] animate-fade-in" style={{ left: `${m.time / 600 * 100}%` }} />
                 ))}
-                {hoverTime !== null && (
+                {hoverTime !== null && hoverX !== null && (
                   <div className="absolute text-[10px] px-2 py-[2px] bg-black text-white rounded shadow" style={{ left: `${hoverX}px`, transform: 'translateX(-50%)', top: '-1.25rem' }}>
                     {format(hoverTime)}
                   </div>
@@ -162,7 +162,6 @@ body{background:#1E1E2F;}
         <BpmTapper />
       </div>
 
-      {/* Marker Lists */}
       <div className="grid grid-cols-2 gap-8 mb-16">
         {['Segment A', 'Segment B'].map(col => {
           const list = markers.filter(m => m.track === col).sort((a, b) => a.time - b.time);
