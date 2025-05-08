@@ -49,7 +49,7 @@ function DurationCalculator() {
     `${String(Math.floor(sec / 3600)).padStart(2, "0")}:${String(Math.floor((sec % 3600) / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
 
   const calc = (): void => {
-    const re = /video starts at (\d{2}:\d{2}:\d{2})[^\d]+(\d{2}:\d{2}:\d{2}).*?audio starts at (\d{2}:\d{2}:\d{2})[^\d]+(\d{2}:\d{2}:\d{2})/i;
+    const re = /video\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?video\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?audio\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?audio\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2})/i;
     const m = input.match(re);
     if (!m) return setResult("Invalid input");
     const [, vs, ve, as, ae] = m;
