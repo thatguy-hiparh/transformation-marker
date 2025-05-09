@@ -61,14 +61,18 @@ function DurationCalculator() {
   };
 
   const fmt = (sec: number): string =>
-    `${String(Math.floor(sec / 3600)).padStart(2, "0")}:${String(Math.floor((sec % 3600) / 60)).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
+    `${String(Math.floor(sec / 3600)).padStart(2, "0")}:${String(
+      Math.floor((sec % 3600) / 60)
+    ).padStart(2, "0")}:${String(sec % 60).padStart(2, "0")}`;
 
   const calc = (): void => {
     const re = /video\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?video\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?audio\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?audio\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2})/i;
     const m = input.match(re);
     if (!m) return setResult("Invalid input");
     const [, vs, ve, as, ae] = m;
-    setResult(`Video: ${fmt(parse(ve) - parse(vs))}\nAudio: ${fmt(parse(ae) - parse(as))}`);
+    setResult(
+      `Video: ${fmt(parse(ve) - parse(vs))}\nAudio: ${fmt(parse(ae) - parse(as))}`
+    );
   };
 
   return (
@@ -122,15 +126,9 @@ export default function TransformationMarkerApp() {
 
   useEffect(() => {
     const st = document.createElement('style');
-    st.textContent = `@keyframes fade-in{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);}}
-  .hide-scrollbar::-webkit-scrollbar{width:0;height:0;}
-  .hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
-  body{background:#1E1E2F;}
-  .animate-fade-in{animation:fade-in .3s ease-out;}`;
+    st.textContent = `@keyframes fade-in{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);} }\n.hide-scrollbar::-webkit-scrollbar{width:0;height:0;}\n.hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}\nbody{background:#1E1E2F;}\n.animate-fade-in{animation:fade-in .3s ease-out;}`;
     document.head.appendChild(st);
-    return () => {
-      document.head.removeChild(st);
-    };
+    return () => { document.head.removeChild(st); };
   }, []);
 
   const format = (s: number): string => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
@@ -171,7 +169,12 @@ export default function TransformationMarkerApp() {
           <h2 className="text-2xl font-semibold">Transformation Marker Timeline</h2>
           <span className="text-xs text-[#8EBBFF]">by Vasile Gutu</span>
         </div>
-        <button onClick={exportCSV} className="bg-[#2A2D40] text-[#8EBBFF] px-4 py-2 rounded border border-[#8EBBFF] hover:bg-[#374160]">Export CSV</button>
+        <button
+          onClick={exportCSV}
+          className="bg-[#2A2D40] text-[#8EBBFF] px-4 py-2 rounded border border-[#8EBBFF] hover:bg-[#374160]"
+        >
+          Export CSV
+        </button>
       </div>
 
       {['Segment A', 'Segment B'].map(track => {
@@ -200,9 +203,7 @@ export default function TransformationMarkerApp() {
                   <div key={m.id} className="absolute top-0 h-8 w-[2px] bg-[#FF6B6B] animate-fade-in" style={{ left: `${m.time / 600 * 100}%` }} />
                 ))}
                 {hoverTime !== null && hoverX !== null && (
-                  <div className="absolute text-sm px-2 py-[2px] bg-black text-white rounded shadow" style={{ left: `${hoverX}px`, transform: 'translateX(-50%)', top: '-1.25rem' }}>
-                    {format(hoverTime)}
-                  </div>
+                  <div className="absolute text-sm px-2 py-[2px] bg-black text-white rounded shadow" style={{ left: `${hoverX}px`, transform: 'translateX(-50%)', top: '-1.25rem' }}>{format(hoverTime)}</div>
                 )}
               </div>
             </div>
