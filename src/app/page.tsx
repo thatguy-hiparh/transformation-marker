@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 
 interface Marker {
   id: number;
@@ -28,16 +28,31 @@ function BpmTapper() {
 
   return (
     <div className="flex items-center gap-2">
-      <button onClick={tap} className="bg-[#2A2D40] text-[#8EBBFF] px-4 py-2 rounded border border-[#8EBBFF] hover:bg-[#374160]">Tap BPM</button>
-      <button onClick={() => { setTaps([]); setBpm(null); }} className="text-sm underline text-[#8EBBFF] hover:text-white">Reset</button>
-      {bpm !== null && <span className="text-xl text-[#FF6B6B] font-semibold">BPM: {bpm}</span>}
+      <button
+        onClick={tap}
+        className="bg-[#2A2D40] text-[#8EBBFF] px-4 py-2 rounded border border-[#8EBBFF] hover:bg-[#374160]"
+      >
+        Tap BPM
+      </button>
+      <button
+        onClick={() => {
+          setTaps([]);
+          setBpm(null);
+        }}
+        className="text-sm underline text-[#8EBBFF] hover:text-white"
+      >
+        Reset
+      </button>
+      {bpm !== null && (
+        <span className="text-xl text-[#FF6B6B] font-semibold">BPM: {bpm}</span>
+      )}
     </div>
   );
 }
 
 /************* Duration Calculator ***********/
 function DurationCalculator() {
-  const [input, setInput] = useState<string>("");
+  const [input, setInput] = useState("");
   const [result, setResult] = useState<string | null>(null);
 
   const parse = (t: string): number => {
@@ -53,18 +68,49 @@ function DurationCalculator() {
     const m = input.match(re);
     if (!m) return setResult("Invalid input");
     const [, vs, ve, as, ae] = m;
-    setResult(`Video: ${fmt(parse(ve) - parse(vs))}\nAudio: ${fmt(parse(ae) - parse(as))}`);
+    setResult(
+      `Video: ${fmt(parse(ve) - parse(vs))}\nAudio: ${fmt(parse(ae) - parse(as))}`
+    );
   };
 
   return (
     <div className="mt-16 border-t border-[#4A4D60] pt-6">
       <h3 className="text-xl font-semibold mb-4">Duration Calculator</h3>
-      <textarea value={input} onChange={(e) => setInput(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); calc(); } }} placeholder="Paste copied time segment input here" className="w-full bg-[#2A2D40] px-4 py-2 rounded text-sm text-white mb-2" rows={1} />
+      <textarea
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        onKeyDown={(e) => {
+          if (e.key === 'Enter') {
+            e.preventDefault();
+            calc();
+          }
+        }}
+        placeholder="Paste copied time segment input here"
+        className="w-full bg-[#2A2D40] px-4 py-2 rounded text-sm text-white mb-2"
+        rows={1}
+      />
       <div className="flex gap-4 mb-4">
-        <button onClick={calc} className="bg-[#8EBBFF] text-[#1E1E2F] px-4 py-2 rounded hover:bg-[#A6CCFF]">Calculate</button>
-        <button onClick={() => { setInput(""); setResult(null); }} className="bg-[#2A2D40] border border-[#8EBBFF] text-[#8EBBFF] px-4 py-2 rounded hover:bg-[#374160]">Reset</button>
+        <button
+          onClick={calc}
+          className="bg-[#8EBBFF] text-[#1E1E2F] px-4 py-2 rounded hover:bg-[#A6CCFF]"
+        >
+          Calculate
+        </button>
+        <button
+          onClick={() => {
+            setInput("");
+            setResult(null);
+          }}
+          className="bg-[#2A2D40] border border-[#8EBBFF] text-[#8EBBFF] px-4 py-2 rounded hover:bg-[#374160]"
+        >
+          Reset
+        </button>
       </div>
-      {result && <pre className="text-sm whitespace-pre-wrap bg-[#1E1E2F] px-4 py-2 rounded border border-[#4A4D60]">{result}</pre>}
+      {result && (
+        <pre className="text-sm whitespace-pre-wrap bg-[#1E1E2F] px-4 py-2 rounded border border-[#4A4D60]">
+          {result}
+        </pre>
+      )}
     </div>
   );
 }
@@ -85,14 +131,13 @@ export default function TransformationMarkerApp() {
   .animate-fade-in{animation:fade-in .3s ease-out;}`;
     document.head.appendChild(st);
     return () => {
-      if (st && st.parentNode) {
-        st.parentNode.removeChild(st);
-      }
+      document.head.removeChild(st);
     };
-  }, []);    
+  }, []);
 
   const format = (s: number): string =>
-    `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+    `${String(Math.floor(s / 60)).padStart(2, '0')}:
+${String(s % 60).padStart(2, '0')}`;
   const ticks = [...Array(601).keys()];
 
   const add = (e: React.MouseEvent<HTMLDivElement>, track: string): void => {
@@ -103,7 +148,11 @@ export default function TransformationMarkerApp() {
   };
 
   const updateMarker = (id: number, key: keyof Marker, val: string): void =>
-    setMarkers((m) => m.map((x) => x.id === id ? { ...x, [key]: val } : x));
+    setMarkers((m) =>
+      m.map((x) =>
+        x.id === id ? { ...x, [key]: val } : x
+      )
+    );
   const deleteMarker = (id: number): void =>
     setMarkers((m) => m.filter((x) => x.id !== id));
   const clearAll = (): void => setMarkers([]);
@@ -145,13 +194,13 @@ export default function TransformationMarkerApp() {
                   <div key={t} className={`absolute top-0 ${t % 60 === 0 ? 'h-full bg-[#8EBBFF]' : 'h-4 bg-[#4A4D60]'} w-px`} style={{ left: `${t / 600 * 100}%` }} />
                 ))}
                 {ticks.filter(t => t % 60 === 0).map(t => (
-                  <div key={'lbl' + t} className="absolute text-[10px] text-[#8EBBFF] mt-1" style={{ left: `${t / 600 * 100}%`, transform: 'translateX(-50%)', top: '2.25rem' }}>{t / 60}</div>
+                  <div key={'lbl' + t} className="absolute text-xs text-[#8EBBFF] mt-1" style={{ left: `${t / 600 * 100}%`, transform: 'translateX(-50%)', top: '2.25rem' }}>{t / 60}</div>
                 ))}
                 {markers.filter(m => m.track === track).map(m => (
                   <div key={m.id} className="absolute top-0 h-8 w-[2px] bg-[#FF6B6B] animate-fade-in" style={{ left: `${m.time / 600 * 100}%` }} />
                 ))}
                 {hoverTime !== null && hoverX !== null && (
-                  <div className="absolute text-[10px] px-2 py-[2px] bg-black text-white rounded shadow" style={{ left: `${hoverX}px`, transform: 'translateX(-50%)', top: '-1.25rem' }}>
+                  <div className="absolute text-sm px-2 py-[2px] bg-black text-white rounded shadow" style={{ left: `${hoverX}px`, transform: 'translateX(-50%)', top: '-1.25rem' }}>
                     {format(hoverTime)}
                   </div>
                 )}
@@ -198,3 +247,4 @@ export default function TransformationMarkerApp() {
     </div>
   );
 }
+Restore Friday - Updated UI and logic
