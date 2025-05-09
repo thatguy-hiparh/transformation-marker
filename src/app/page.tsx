@@ -233,7 +233,7 @@ export default function TransformationMarkerApp() {
                           <option key={o}>{o}</option>
                         ))}
                       </select>
-                      <button onClick={() => deleteMarker(m.id)} className="bg-[#FF6B6B] text-white px-2 py-1 rounded hover:bg-red-600">Delete</button>
+                      <button onClick={() => deleteMarker(m.id)} className="bg-[#FF6B6B] text-white px-2 py-1 rounded hover:bg-[#D24C4C]">Delete</button>
                     </div>
                     <input value={m.note} onChange={e => updateMarker(m.id, 'note', e.target.value)} placeholder="Add note..." className="text-sm bg-[#1E1E2F] border border-[#4A4D60] rounded px-3 py-1 text-[#F4F5FC] placeholder:text-[#8EBBFF]" />
                   </div>
