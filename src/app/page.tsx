@@ -168,10 +168,6 @@ export default function TransformationMarkerApp() {
             <span className="text-xs text-[#8EBBFF]">by Vasile Gutu</span>
           </div>
         </div>
-        <button onClick={exportCSV} className="bg-[#2A2D40] text-[#8EBBFF] px-4 py-2 rounded border border-[#8EBBFF] hover:bg-[#374160]">
-          Export CSV
-        </button>
-      </div>
         <button onClick={exportCSV} className="bg-[#2A2D40] text-[#8EBBFF] px-4 py-2 rounded border border-[#8EBBFF] hover:bg-[#374160]">Export CSV</button>
       </div>
 
