@@ -1,9 +1,53 @@
-
 <svg width="500" height="500" viewBox="0 0 500 500" xmlns="http://www.w3.org/2000/svg">
-  <rect width="500" height="500" fill="white"/>
-  <circle cx="250" cy="250" r="130" fill="none" stroke="white" stroke-width="20" stroke-dasharray="230 40"/>
-  <circle cx="250" cy="250" r="110" fill="none" stroke="white" stroke-width="10" stroke-dasharray="200 60"/>
-  <text x="250" y="270" font-family="Arial" font-weight="bold" font-size="90" text-anchor="middle" fill="white">TMT</text>
-  <line x1="160" y1="340" x2="130" y2="370" stroke="#FF6B5B" stroke-width="10"/>
-  <line x1="340" y1="160" x2="370" y2="130" stroke="#FF6B5B" stroke-width="10"/>
+  <!-- Your two rings -->
+  <circle
+    cx="250"
+    cy="250"
+    r="130"
+    fill="none"
+    stroke="white"
+    stroke-width="20"
+    stroke-dasharray="230 40"
+  />
+  <circle
+    cx="250"
+    cy="250"
+    r="110"
+    fill="none"
+    stroke="white"
+    stroke-width="10"
+    stroke-dasharray="200 60"
+  />
+
+  <!-- Centered “TMT” text -->
+  <text
+    x="250"
+    y="250"
+    font-family="Arial"
+    font-weight="bold"
+    font-size="90"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    fill="white"
+  >
+    TMT
+  </text>
+
+  <!-- Accent lines -->
+  <line
+    x1="160"
+    y1="340"
+    x2="130"
+    y2="370"
+    stroke="#FF6B5B"
+    stroke-width="10"
+  />
+  <line
+    x1="340"
+    y1="160"
+    x2="370"
+    y2="130"
+    stroke="#FF6B5B"
+    stroke-width="10"
+  />
 </svg>
