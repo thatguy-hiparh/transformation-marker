@@ -131,7 +131,9 @@ export default function TransformationMarkerApp() {
     const st = document.createElement('style');
     st.textContent = `@keyframes fade-in { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }\n.hide-scrollbar::-webkit-scrollbar { width: 0; height: 0; }\n.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }\nbody { background: #1E1E2F; }\n.animate-fade-in { animation: fade-in .3s ease-out; }`;
     document.head.appendChild(st);
-    return () => document.head.removeChild(st);
+    return () => {
+      document.head.removeChild(st);
+    };
   }, []);
 
   const format = (s: number): string =>
@@ -172,90 +174,8 @@ export default function TransformationMarkerApp() {
       <div className="flex justify-between items-center mb-6">
         <div>
           <h2 className="text-2xl font-semibold">Transformation Marker Timeline</h2>
-          <span className="text-xs text-[#8EBBFF]">by Vasile Gutu</span>
+          <span className="text-xs text-[#8EBBFF]">by Vasende Gutu</span>
         </div>
         <button
           onClick={exportCSV}
-          className="bg-[#2A2D40] text-[#8EBBFF] px-4 py-2 rounded border border-[#8EBBFF] hover:bg-[#374160]"
-        >
-          Export CSV
-        </button>
-      </div>
-
-      {['Segment A', 'Segment B'].map((track) => {
-        const label = track === 'Segment A' ? 'A' : 'B';
-        return (
-          <div key={track} className="flex items-center gap-3 mb-10">
-            <span className="text-2xl font-semibold text-[#8EBBFF] w-4 text-center">
-              {label}
-            </span>
-            <div className="relative flex-1">
-              <div
-                className="w-full h-8 bg-[#2A2D40] rounded-2xl shadow-inner cursor-pointer"
-                onClick={(e) => add(e, track)}
-                onMouseMove={(e) => {
-                  const { left, width } = e.currentTarget.getBoundingClientRect();
-                  setHoverX(e.clientX - left);
-                  setHoverTime(
-                    Math.round((e.clientX - left) / width * timelineLength)
-                  );
-                }}
-                onMouseLeave={() => setHoverTime(null)}
-              >
-                {ticks.filter((t) => t % 10 === 0).map((t) => (
-                  <div
-                    key={t}
-                    className={`absolute top-0 ${
-                      t % 60 === 0 ? 'h-full bg-[#8EBBFF]' : 'h-4 bg-[#4A4D60]'
-                    } w-px`}
-                    style={{ left: `${t / 600 * 100}%` }}
-                  />
-                ))}
-                {ticks.filter((t) => t % 60 === 0).map((t) => (
-                  <div
-                    key={`lbl${t}`}
-                    className="absolute text-xs text-[#8EBBFF] mt-1"
-                    style={{
-                      left: `${t / 600 * 100}%`,
-                      transform: 'translateX(-50%)',
-                      top: '2.25rem',
-                    }}
-                  >
-                    {t / 60}
-                  </div>
-                ))}
-                {markers.filter((m) => m.track === track).map((m) => (
-                  <div
-                    key={m.id}
-                    className="absolute top-0 h-8 w-[2px] bg-[#FF6B6B] animate-fade-in"
-                    style={{ left: `${m.time / 600 * 100}%` }}
-                  />
-                ))}
-                {hoverTime !== null && hoverX !== null && (
-                  <div
-                    className="absolute text-sm px-2 py-[2px] bg-[#1E1E2F] text-white rounded shadow"
-                    style={{ left: `${hoverX}px`, transform: 'translateX(-50%)', top: '-1.25rem' }}
-                  >
-                    {format(hoverTime)}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-
-      <div className="mb-10 flex items-center gap-6">
-        <button
-          onClick={clearAll}
-          className="bg-[#2A2D40] text-[#8EBBFF] border border-[#8EBBFF] px-4 py-2 rounded hover:bg-[#374160]"
-        >
-          Clear All Markers
-        </button>
-        <BpmTapper />
-      </div>
-
-      <DurationCalculator />
-    </>
-  );
-}
+          className="bg-[#2A2D40] text-[#8EBBFF] px-4 py-2 rounded border border-[#8EBB
