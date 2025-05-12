@@ -9,7 +9,7 @@ import React, { useState, useEffect } from 'react';
  ************************/
 interface Marker {
   id: number;
-  time: number; // seconds on the timeline
+  time: number;          // seconds on the timeline
   track: 'Segment A' | 'Segment B';
   label: string;
   note: string;
@@ -17,17 +17,18 @@ interface Marker {
 
 /**************** BPM Tapper ****************/
 function BpmTapper() {
-  const [taps, setTaps] = useState<number[]>([]);
-  const [bpm, setBpm] = useState<number | null>(null);
+  const [taps, setTaps]   = useState<number[]>([]);
+  const [bpm,  setBpm]    = useState<number | null>(null);
 
   const tap = () => {
-    const now = Date.now();
-    const recent = taps.filter((t) => now - t < 5000).concat(now);
+    const now     = Date.now();
+    const recent  = taps.filter(t => now - t < 5_000).concat(now);
     setTaps(recent);
+
     if (recent.length >= 2) {
       const intervals = recent.slice(1).map((t, i) => t - recent[i]);
-      const avg = intervals.reduce((a, b) => a + b, 0) / intervals.length;
-      setBpm(Math.round(60000 / avg));
+      const avg       = intervals.reduce((a, b) => a + b, 0) / intervals.length;
+      setBpm(Math.round(60_000 / avg));
     }
   };
 
@@ -40,10 +41,7 @@ function BpmTapper() {
         Tap BPM
       </button>
       <button
-        onClick={() => {
-          setTaps([]);
-          setBpm(null);
-        }}
+        onClick={() => { setTaps([]); setBpm(null); }}
         className="text-sm underline text-[#10a37f] hover:text-white"
       >
         Reset
@@ -57,45 +55,40 @@ function BpmTapper() {
 
 /************* Duration Calculator ***********/
 function DurationCalculator() {
-  const [input, setInput] = useState('');
+  const [input,  setInput]  = useState('');
   const [result, setResult] = useState<string | null>(null);
 
-  const parse = (t: string): number => {
+  const parse = (t: string) => {
     const [h, m, s] = t.split(':').map(Number);
     return h * 3600 + m * 60 + s;
   };
 
-  const fmt = (sec: number): string =>
-    `${String(Math.floor(sec / 3600)).padStart(2, '0')}:${String(
-      Math.floor((sec % 3600) / 60)
-    ).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+  const fmt = (sec: number) =>
+    `${String(Math.floor(sec / 3600)).padStart(2, '0')}:` +
+    `${String(Math.floor((sec % 3600) / 60)).padStart(2, '0')}:` +
+    `${String(sec % 60).padStart(2, '0')}`;
 
   const calc = () => {
-    const re = /video\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?video\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?audio\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?audio\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2})/i;
-    const m = input.match(re);
+    const re = /video\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?video\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?audio\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?audio\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2})/is;
+    const m  = input.match(re);
     if (!m) return setResult('Invalid input');
     const [, vs, ve, as, ae] = m;
-    setResult(
-      `Video: ${fmt(parse(ve) - parse(vs))}\nAudio: ${fmt(parse(ae) - parse(as))}`
-    );
+    setResult(`Video: ${fmt(parse(ve) - parse(vs))}\nAudio: ${fmt(parse(ae) - parse(as))}`);
   };
 
   return (
     <div className="mt-16 border-t border-[#5a5f72] pt-6">
       <h3 className="text-xl font-semibold mb-4 text-[#d1d5db]">Duration Calculator</h3>
+
       <textarea
         value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            calc();
-          }
-        }}
-        placeholder="Paste copied time segment input here"
+        onChange={e => setInput(e.target.value)}
+        onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); calc(); } }}
+        placeholder="Paste copied time-segment text here"
         className="w-full bg-[#2f3136] px-4 py-2 rounded text-sm text-[#d1d5db] mb-2"
         rows={1}
       />
+
       <div className="flex gap-4 mb-4">
         <button
           onClick={calc}
@@ -104,15 +97,13 @@ function DurationCalculator() {
           Calculate
         </button>
         <button
-          onClick={() => {
-            setInput('');
-            setResult(null);
-          }}
+          onClick={() => { setInput(''); setResult(null); }}
           className="bg-[#202124] border border-[#10a37f] text-[#10a37f] px-4 py-2 rounded hover:bg-[#565c6c]"
         >
           Reset
         </button>
       </div>
+
       {result && (
         <pre className="text-sm whitespace-pre-wrap bg-[#2f3136] px-4 py-2 rounded border border-[#5a5f72] text-[#d1d5db]">
           {result}
@@ -124,54 +115,63 @@ function DurationCalculator() {
 
 /**************** Main App *******************/
 export default function TransformationMarkerApp() {
-  const [markers, setMarkers] = useState<Marker[]>([]);
+  const [markers,   setMarkers]   = useState<Marker[]>([]);
   const [hoverTime, setHoverTime] = useState<number | null>(null);
-  const [hoverX, setHoverX] = useState<number | null>(null);
-  const timelineLength = 600; // seconds
+  const [hoverX,    setHoverX]    = useState<number | null>(null);
+  const timelineLength = 600; // seconds (10 min)
 
-  /******** Inject global styles ********/
+  /* Inject global styles (scrollbar + bg + keyframe) */
   useEffect(() => {
-    const st = document.createElement('style');
-    st.textContent = `@keyframes fade-in { from { opacity: 0; transform: scale(.95); } to { opacity: 1; transform: scale(1); } }\n.hide-scrollbar::-webkit-scrollbar { width: 0; height: 0; }\n.hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }\nbody { background: #202124; }`;
+    const st          = document.createElement('style');
+    st.textContent    =
+      `@keyframes fade-in { from { opacity:0; transform:scale(.95);} to { opacity:1; transform:scale(1);} }
+       .hide-scrollbar::-webkit-scrollbar{width:0;height:0;}
+       .hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
+       body{background:#202124;}`;
     document.head.appendChild(st);
-    return () => document.head.removeChild(st);
+    return () => { document.head.removeChild(st); };
   }, []);
 
-  /******** Helpers ********/
-  const format = (s: number): string => `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+  /* Helpers */
+  const fmt = (s: number) =>
+    `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
   const ticks = Array.from({ length: timelineLength + 1 }, (_, i) => i);
 
-  /******** Marker actions ********/
-  const addMarker = (e: React.MouseEvent<HTMLDivElement>, track: Marker['track']) => {
+  /* Marker actions */
+  const addMarker = (
+    e: React.MouseEvent<HTMLDivElement>,
+    track: Marker['track']
+  ) => {
     const { left, width } = e.currentTarget.getBoundingClientRect();
     const pos = Math.max(0, Math.min(e.clientX - left, width));
     const sec = Math.round((pos / width) * timelineLength);
-    setMarkers((m) => [...m, { id: Date.now(), time: sec, track, label: 'Select', note: '' }]);
+    setMarkers(m => [...m, { id: Date.now(), time: sec, track, label: 'Select', note: '' }]);
   };
 
   const updateMarker = (id: number, key: keyof Marker, val: string) =>
-    setMarkers((m) => m.map((x) => (x.id === id ? { ...x, [key]: val } : x)));
+    setMarkers(m => m.map(x => (x.id === id ? { ...x, [key]: val } : x)));
 
-  const deleteMarker = (id: number) => setMarkers((m) => m.filter((x) => x.id !== id));
-  const clearAll = () => setMarkers([]);
+  const deleteMarker = (id: number) => setMarkers(m => m.filter(x => x.id !== id));
+  const clearAll     = () => setMarkers([]);
 
-  /******** CSV export ********/
+  /* CSV export */
   const exportCSV = () => {
     const pad = (n: number) => String(n).padStart(2, '0');
-    const formatFull = (s: number) => `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
-    const rows = ['Segment,Time,Label,Note', ...markers.map((m) => `${m.track},${formatFull(m.time)},${m.label},${m.note}`)];
-    const blob = new Blob([rows.join('\n')], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
+    const full = (s: number) => `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
+    const rows = ['Segment,Time,Label,Note',
+      ...markers.map(m => `${m.track},${full(m.time)},${m.label},${m.note}`)];
+    const url  = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' }));
+    const a    = document.createElement('a');
     a.href = url;
     a.download = 'markers.csv';
     a.click();
     URL.revokeObjectURL(url);
   };
 
-  /******** UI ********/
+  /* UI */
   return (
     <div className="p-6 max-w-6xl mx-auto text-[#d1d5db] min-h-screen overflow-x-hidden">
+
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
         <div>
@@ -186,33 +186,35 @@ export default function TransformationMarkerApp() {
         </button>
       </div>
 
-      {/* Timeline for each segment */}
-      {(['Segment A', 'Segment B'] as const).map((track) => (
+      {/* Timelines */}
+      {(['Segment A', 'Segment B'] as const).map(track => (
         <div key={track} className="flex items-center gap-3 mb-10">
           <span className="text-2xl font-semibold text-[#10a37f] w-4 text-center">
             {track === 'Segment A' ? 'A' : 'B'}
           </span>
+
           <div className="relative flex-1">
             <div
               className="w-full h-8 bg-[#2f3136] rounded-2xl shadow-inner cursor-pointer"
-              onClick={(e) => addMarker(e, track)}
-              onMouseMove={(e) => {
+              onClick={e => addMarker(e, track)}
+              onMouseMove={e => {
                 const { left, width } = e.currentTarget.getBoundingClientRect();
                 setHoverX(e.clientX - left);
                 setHoverTime(Math.round(((e.clientX - left) / width) * timelineLength));
               }}
               onMouseLeave={() => setHoverTime(null)}
             >
-              {/* timeline ticks */}
-              {ticks.filter((t) => t % 10 === 0).map((t) => (
+              {/* ticks */}
+              {ticks.filter(t => t % 10 === 0).map(t => (
                 <div
                   key={t}
                   className={`absolute top-0 ${t % 60 === 0 ? 'h-full bg-[#10a37f]' : 'h-4 bg-[#5a5f72]'} w-px`}
                   style={{ left: `${(t / timelineLength) * 100}%` }}
                 />
               ))}
+
               {/* minute labels */}
-              {ticks.filter((t) => t % 60 === 0).map((t) => (
+              {ticks.filter(t => t % 60 === 0).map(t => (
                 <div
                   key={`lbl${t}`}
                   className="absolute text-xs text-[#10a37f] mt-1"
@@ -221,21 +223,23 @@ export default function TransformationMarkerApp() {
                   {t / 60}
                 </div>
               ))}
+
               {/* markers */}
-              {markers.filter((m) => m.track === track).map((m) => (
+              {markers.filter(m => m.track === track).map(m => (
                 <div
                   key={m.id}
                   className="absolute top-0 h-8 w-[2px] bg-[#FF6B6B] animate-fade-in"
                   style={{ left: `${(m.time / timelineLength) * 100}%` }}
                 />
               ))}
-              {/* hover time tooltip */}
+
+              {/* hover tooltip */}
               {hoverTime !== null && hoverX !== null && (
                 <div
                   className="absolute text-sm px-2 py-[2px] bg-[#202124] text-[#d1d5db] rounded shadow"
                   style={{ left: `${hoverX}px`, transform: 'translateX(-50%)', top: '-1.25rem' }}
                 >
-                  {format(hoverTime)}
+                  {fmt(hoverTime)}
                 </div>
               )}
             </div>
@@ -255,33 +259,33 @@ export default function TransformationMarkerApp() {
       </div>
 
       {/* Marker lists */}
-      <div className="grid grid-cols-2 gap-8 mb-16 text-[#d1d5db]">
-        {(['Segment A', 'Segment B'] as const).map((col) => (
+      <div className="grid grid-cols-2 gap-8 mb-16">
+        {(['Segment A', 'Segment B'] as const).map(col => (
           <div key={col}>
             <h3 className="text-lg font-medium mb-2">{col} Markers</h3>
             <div className="space-y-4 max-h-96 overflow-y-auto pr-2 hide-scrollbar">
               {markers
-                .filter((m) => m.track === col)
+                .filter(m => m.track === col)
                 .sort((a, b) => a.time - b.time)
-                .map((m) => (
-                  <div
-                    key={m.id}
-                    className="flex flex-col gap-2 p-3 bg-[#2f3136] rounded-lg shadow-sm animate-fade-in"
-                  >
+                .map(m => (
+                  <div key={m.id} className="flex flex-col gap-2 p-3 bg-[#2f3136] rounded-lg shadow-sm animate-fade-in">
+
                     <div className="flex items-center gap-4">
-                      <span className="w-16 font-mono text-sm">{format(m.time)}</span>
+                      <span className="w-16 font-mono text-sm">{fmt(m.time)}</span>
+
                       <select
                         value={m.label}
-                        onChange={(e) => updateMarker(m.id, 'label', e.target.value)}
+                        onChange={e => updateMarker(m.id, 'label', e.target.value)}
                         className="appearance-none bg-[#2f3136] text-[#d1d5db] text-sm rounded-md px-3 py-2 border border-[#5a5f72] hover:border-[#10a37f] focus:ring-2 focus:ring-[#10a37f]"
                       >
                         <option>Select transformation</option>
                         {`Different Intro,New Drum Pattern,Different Instrument,Effects Added,Sample-Based Edit,Harmonic Variation,Voice Replaced by Instrument,Looped or Extended,Voiceover,Other,Different Ending/Outro,Same song - Different part`
                           .split(',')
-                          .map((o) => (
-                            <option key={o}>{o}</option>
+                          .map(opt => (
+                            <option key={opt}>{opt}</option>
                           ))}
                       </select>
+
                       <button
                         onClick={() => deleteMarker(m.id)}
                         className="bg-[#FF6B6B] text-white px-2 py-1 rounded hover:bg-[#D24C4C]"
@@ -289,10 +293,11 @@ export default function TransformationMarkerApp() {
                         Delete
                       </button>
                     </div>
+
                     <input
                       value={m.note}
-                      onChange={(e) => updateMarker(m.id, 'note', e.target.value)}
-                      placeholder="Add note..."
+                      onChange={e => updateMarker(m.id, 'note', e.target.value)}
+                      placeholder="Add note…"
                       className="text-sm bg-[#202124] border border-[#5a5f72] rounded px-3 py-1 text-[#d1d5db] placeholder:text-[#5a5f72]"
                     />
                   </div>
@@ -302,7 +307,7 @@ export default function TransformationMarkerApp() {
         ))}
       </div>
 
-      {/* Duration calc */}
+      {/* Duration calculator */}
       <DurationCalculator />
     </div>
   );
