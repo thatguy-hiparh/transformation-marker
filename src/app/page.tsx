@@ -1,6 +1,4 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-// src/app/TransformationMarkerApp.tsx
-
+// src/app/page.tsx
 'use client';
 
 import Image from 'next/image';
