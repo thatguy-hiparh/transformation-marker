@@ -5,24 +5,24 @@
 import React, { useState, useEffect } from 'react';
 
 /***********************
- *   Data structures   *
+ *  Data structures    *
  ************************/
 interface Marker {
-  id: number;
-  time: number;          // seconds on the timeline
+  id:    number;
+  time:  number;                 // seconds
   track: 'Segment A' | 'Segment B';
   label: string;
-  note: string;
+  note:  string;
 }
 
 /**************** BPM Tapper ****************/
 function BpmTapper() {
-  const [taps, setTaps]   = useState<number[]>([]);
-  const [bpm,  setBpm]    = useState<number | null>(null);
+  const [taps, setTaps] = useState<number[]>([]);
+  const [bpm,  setBpm]  = useState<number | null>(null);
 
   const tap = () => {
-    const now     = Date.now();
-    const recent  = taps.filter(t => now - t < 5_000).concat(now);
+    const now    = Date.now();
+    const recent = taps.filter(t => now - t < 5_000).concat(now);
     setTaps(recent);
 
     if (recent.length >= 2) {
@@ -40,12 +40,14 @@ function BpmTapper() {
       >
         Tap BPM
       </button>
+
       <button
         onClick={() => { setTaps([]); setBpm(null); }}
         className="text-sm underline text-[#10a37f] hover:text-white"
       >
         Reset
       </button>
+
       {bpm !== null && (
         <span className="text-2xl text-[#FF6B6B] font-semibold">BPM: {bpm}</span>
       )}
@@ -55,7 +57,7 @@ function BpmTapper() {
 
 /************* Duration Calculator ***********/
 function DurationCalculator() {
-  const [input,  setInput]  = useState('');
+  const [input,  setInput ] = useState('');
   const [result, setResult] = useState<string | null>(null);
 
   const parse = (t: string) => {
@@ -69,16 +71,22 @@ function DurationCalculator() {
     `${String(sec % 60).padStart(2, '0')}`;
 
   const calc = () => {
-    const re = /video\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?video\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?audio\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2}).*?audio\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2})/is;
-    const m  = input.match(re);
+    /* dot-all flag (/s) replaced with [\s\S]*? for older targets */
+    const re =
+      /video\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2})[\s\S]*?video\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2})[\s\S]*?audio\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2})[\s\S]*?audio\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2})/i;
+
+    const m = input.match(re);
     if (!m) return setResult('Invalid input');
     const [, vs, ve, as, ae] = m;
+
     setResult(`Video: ${fmt(parse(ve) - parse(vs))}\nAudio: ${fmt(parse(ae) - parse(as))}`);
   };
 
   return (
     <div className="mt-16 border-t border-[#5a5f72] pt-6">
-      <h3 className="text-xl font-semibold mb-4 text-[#d1d5db]">Duration Calculator</h3>
+      <h3 className="text-xl font-semibold mb-4 text-[#d1d5db]">
+        Duration Calculator
+      </h3>
 
       <textarea
         value={input}
@@ -96,6 +104,7 @@ function DurationCalculator() {
         >
           Calculate
         </button>
+
         <button
           onClick={() => { setInput(''); setResult(null); }}
           className="bg-[#202124] border border-[#10a37f] text-[#10a37f] px-4 py-2 rounded hover:bg-[#565c6c]"
@@ -115,36 +124,38 @@ function DurationCalculator() {
 
 /**************** Main App *******************/
 export default function TransformationMarkerApp() {
+  /* state */
   const [markers,   setMarkers]   = useState<Marker[]>([]);
   const [hoverTime, setHoverTime] = useState<number | null>(null);
   const [hoverX,    setHoverX]    = useState<number | null>(null);
-  const timelineLength = 600; // seconds (10 min)
 
-  /* Inject global styles (scrollbar + bg + keyframe) */
+  const TIMELINE = 600; // 10 minutes
+
+  /* global styles (bg + scrollbar + animation) */
   useEffect(() => {
-    const st          = document.createElement('style');
-    st.textContent    =
-      `@keyframes fade-in { from { opacity:0; transform:scale(.95);} to { opacity:1; transform:scale(1);} }
-       .hide-scrollbar::-webkit-scrollbar{width:0;height:0;}
-       .hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}
-       body{background:#202124;}`;
-    document.head.appendChild(st);
-    return () => { document.head.removeChild(st); };
+    const s = document.createElement('style');
+    s.textContent =
+      `@keyframes fade-in{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}` +
+      `.hide-scrollbar::-webkit-scrollbar{width:0;height:0}` +
+      `.hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none}` +
+      `body{background:#202124}`;
+    document.head.appendChild(s);
+    return () => { document.head.removeChild(s); };
   }, []);
 
-  /* Helpers */
-  const fmt = (s: number) =>
-    `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-  const ticks = Array.from({ length: timelineLength + 1 }, (_, i) => i);
+  /* helpers */
+  const fmt = (sec: number) =>
+    `${String(Math.floor(sec / 60)).padStart(2, '0')}:${String(sec % 60).padStart(2, '0')}`;
+  const ticks = Array.from({ length: TIMELINE + 1 }, (_, i) => i);
 
-  /* Marker actions */
+  /* marker actions */
   const addMarker = (
     e: React.MouseEvent<HTMLDivElement>,
     track: Marker['track']
   ) => {
     const { left, width } = e.currentTarget.getBoundingClientRect();
     const pos = Math.max(0, Math.min(e.clientX - left, width));
-    const sec = Math.round((pos / width) * timelineLength);
+    const sec = Math.round((pos / width) * TIMELINE);
     setMarkers(m => [...m, { id: Date.now(), time: sec, track, label: 'Select', note: '' }]);
   };
 
@@ -156,15 +167,17 @@ export default function TransformationMarkerApp() {
 
   /* CSV export */
   const exportCSV = () => {
-    const pad = (n: number) => String(n).padStart(2, '0');
+    const pad  = (n: number) => String(n).padStart(2, '0');
     const full = (s: number) => `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
-    const rows = ['Segment,Time,Label,Note',
-      ...markers.map(m => `${m.track},${full(m.time)},${m.label},${m.note}`)];
-    const url  = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' }));
-    const a    = document.createElement('a');
-    a.href = url;
-    a.download = 'markers.csv';
-    a.click();
+
+    const rows = [
+      'Segment,Time,Label,Note',
+      ...markers.map(m => `${m.track},${full(m.time)},${m.label},${m.note}`)
+    ];
+
+    const url = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' }));
+    const a   = document.createElement('a');
+    a.href = url; a.download = 'markers.csv'; a.click();
     URL.revokeObjectURL(url);
   };
 
@@ -178,6 +191,7 @@ export default function TransformationMarkerApp() {
           <h2 className="text-2xl font-semibold">Transformation Marker Timeline</h2>
           <span className="text-xs">by VG</span>
         </div>
+
         <button
           onClick={exportCSV}
           className="bg-[#202124] text-[#10a37f] px-4 py-2 rounded border border-[#10a37f] hover:bg-[#565c6c]"
@@ -200,7 +214,7 @@ export default function TransformationMarkerApp() {
               onMouseMove={e => {
                 const { left, width } = e.currentTarget.getBoundingClientRect();
                 setHoverX(e.clientX - left);
-                setHoverTime(Math.round(((e.clientX - left) / width) * timelineLength));
+                setHoverTime(Math.round(((e.clientX - left) / width) * TIMELINE));
               }}
               onMouseLeave={() => setHoverTime(null)}
             >
@@ -209,7 +223,7 @@ export default function TransformationMarkerApp() {
                 <div
                   key={t}
                   className={`absolute top-0 ${t % 60 === 0 ? 'h-full bg-[#10a37f]' : 'h-4 bg-[#5a5f72]'} w-px`}
-                  style={{ left: `${(t / timelineLength) * 100}%` }}
+                  style={{ left: `${(t / TIMELINE) * 100}%` }}
                 />
               ))}
 
@@ -218,7 +232,7 @@ export default function TransformationMarkerApp() {
                 <div
                   key={`lbl${t}`}
                   className="absolute text-xs text-[#10a37f] mt-1"
-                  style={{ left: `${(t / timelineLength) * 100}%`, transform: 'translateX(-50%)', top: '2.25rem' }}
+                  style={{ left: `${(t / TIMELINE) * 100}%`, transform: 'translateX(-50%)', top: '2.25rem' }}
                 >
                   {t / 60}
                 </div>
@@ -229,7 +243,7 @@ export default function TransformationMarkerApp() {
                 <div
                   key={m.id}
                   className="absolute top-0 h-8 w-[2px] bg-[#FF6B6B] animate-fade-in"
-                  style={{ left: `${(m.time / timelineLength) * 100}%` }}
+                  style={{ left: `${(m.time / TIMELINE) * 100}%` }}
                 />
               ))}
 
@@ -258,18 +272,18 @@ export default function TransformationMarkerApp() {
         <BpmTapper />
       </div>
 
-      {/* Marker lists */}
+      {/* Marker tables */}
       <div className="grid grid-cols-2 gap-8 mb-16">
         {(['Segment A', 'Segment B'] as const).map(col => (
           <div key={col}>
             <h3 className="text-lg font-medium mb-2">{col} Markers</h3>
+
             <div className="space-y-4 max-h-96 overflow-y-auto pr-2 hide-scrollbar">
               {markers
                 .filter(m => m.track === col)
                 .sort((a, b) => a.time - b.time)
                 .map(m => (
                   <div key={m.id} className="flex flex-col gap-2 p-3 bg-[#2f3136] rounded-lg shadow-sm animate-fade-in">
-
                     <div className="flex items-center gap-4">
                       <span className="w-16 font-mono text-sm">{fmt(m.time)}</span>
 
@@ -281,9 +295,7 @@ export default function TransformationMarkerApp() {
                         <option>Select transformation</option>
                         {`Different Intro,New Drum Pattern,Different Instrument,Effects Added,Sample-Based Edit,Harmonic Variation,Voice Replaced by Instrument,Looped or Extended,Voiceover,Other,Different Ending/Outro,Same song - Different part`
                           .split(',')
-                          .map(opt => (
-                            <option key={opt}>{opt}</option>
-                          ))}
+                          .map(opt => <option key={opt}>{opt}</option>)}
                       </select>
 
                       <button
