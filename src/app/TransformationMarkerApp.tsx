@@ -104,10 +104,7 @@ function DurationCalculator() {
           Calculate
         </button>
         <button
-          onClick={() => {
-            setInput("");
-            setResult(null);
-          }}
+          onClick={() => { setInput(""); setResult(null); }}
           className="bg-[#2A2D40] border border-[#8EBBFF] text-[#8EBBFF] px-4 py-2 rounded hover:bg-[#374160]"
         >
           Reset
@@ -122,8 +119,6 @@ function DurationCalculator() {
   );
 }
 
-/**************** Main App *******************/
-
 export default function TransformationMarkerApp() {
   const [markers, setMarkers] = useState<Marker[]>([]);
   const [hoverTime, setHoverTime] = useState<number | null>(null);
@@ -132,22 +127,12 @@ export default function TransformationMarkerApp() {
 
   useEffect(() => {
     const st = document.createElement('style');
-    st.textContent = `
-      @keyframes fade-in {
-        from { opacity: 0; transform: scale(.95); }
-        to   { opacity: 1; transform: scale(1); }
-      }
-      .hide-scrollbar::-webkit-scrollbar { width: 0; height: 0; }
-      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-      body { background: #1E1E2F; }
-      .animate-fade-in { animation: fade-in .3s ease-out; }
-    `;
+    st.textContent = `@keyframes fade-in{from{opacity:0;transform:scale(.95);}to{opacity:1;transform:scale(1);} }\n.hide-scrollbar::-webkit-scrollbar{width:0;height:0;}\n.hide-scrollbar{-ms-overflow-style:none;scrollbar-width:none;}\nbody{background:#1E1E2F;}\n.animate-fade-in{animation:fade-in .3s ease-out;} `;
     document.head.appendChild(st);
     return () => { document.head.removeChild(st); };
   }, []);
 
-  const format = (s: number): string =>
-    `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+  const format = (s: number): string => `${String(Math.floor(s / 60)).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
   const ticks = [...Array(601).keys()];
 
   const add = (e: React.MouseEvent<HTMLDivElement>, track: string): void => {
@@ -164,10 +149,11 @@ export default function TransformationMarkerApp() {
   const clearAll = (): void => setMarkers([]);
 
   const exportCSV = (): void => {
-    const pad = (n: number): string => String(n).padStart(2, '0');
-    const formatFull = (s: number): string => `${pad(Math.floor(s / 60))}:${pad(s % 60)}`;
-    const rows = ['Segment,Time,Label,Note', ...markers.map((m) =>
-      `${m.track},${formatFull(m.time)},${m.label},${m.note}`)];
+    const pad = (n: number): string => String(n).padStart(2,'0');
+    const formatFull = (s: number): string =>
+      `${pad(Math.floor(s/60))}:${pad(s%60)}`;
+    const rows = ['Segment,Time,Label,Note',
+      ...markers.map((m) => `${m.track},${formatFull(m.time)},${m.label},${m.note}`)];
     const url = URL.createObjectURL(new Blob([rows.join('\n')], { type: 'text/csv' }));
     const a = document.createElement('a'); a.href = url; a.download = 'markers.csv'; a.click();
     URL.revokeObjectURL(url);
@@ -175,7 +161,7 @@ export default function TransformationMarkerApp() {
 
   return (
     <div className="p-6 max-w-6xl mx-auto text-[#F4F5FC] min-h-screen overflow-x-hidden">
-      {['Segment A', 'Segment B'].map(track => {
+      {['Segment A','Segment B'].map((track) => {
         const label = track === 'Segment A' ? 'A' : 'B';
         return (
           <div key={track} className="flex items-center gap-3 mb-10">
@@ -187,62 +173,12 @@ export default function TransformationMarkerApp() {
                 onMouseMove={(e) => {
                   const { left, width } = e.currentTarget.getBoundingClientRect();
                   setHoverX(e.clientX - left);
-                  setHoverTime(Math.round((e.clientX - left) / width * timelineLength));
+                  setHoverTime(Math.round((e.clientX - left)/width*timelineLength));
                 }}
                 onMouseLeave={() => setHoverTime(null)}
               >
                 {ticks.filter(t => t % 10 === 0).map(t => (
                   <div
                     key={t}
-                    className={`absolute top-0 ${t % 60 === 0 ? 'h-full bg-#[8EBBFF]' : 'h-4 bg-[#4A4D60]'} w-px`}
-                    style={{ left: `${t / 600 * 100}%` }}
-                  />
-                ))}
-                {ticks.filter(t => t % 60 === 0).map(t => (
-                  <div
-                    key={`lbl${t}`}
-                    className="absolute text-xs text-[#8EBBFF] mt-1"
-                    style={{ left: `${t / 600 * 100}%`, transform: 'translateX(-50%)', top: '2.25rem' }}
-                  >
-                    {t / 60}
-                  </div>
-                ))}
-                {markers.filter(m => m.track === track).map(m => (
-                  <div
-                    key={m.id}
-                    className="absolute top-0 h-8 w-[2px] bg-[#FF6B6B] animate-fade-in"
-                    style={{ left: `${m.time / 600 * 100}%` }}
-                  />
-                ))}
-                {hoverTime !== null && hoverX !== null && (
-                  <div
-                    className="absolute text-sm px-2 py-[2px] bg-[#1E1E2F] text-white rounded shadow"
-                    style={{ left: `${hoverX}px`, transform: 'translateX(-50%)', top: '-1.25rem' }}
-                  >
-                    {format(hoverTime)}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        );
-      })}
-
-      <div className="mb-10 flex items-center gap-6">
-        <button
-          onClick={clearAll}
-          className="bg-[#2A2D40] text-[#8EBBFF] border border-[#8EBBFF] px-4 py-2 rounded hover:bg-[#374160]"
-        >
-          Clear All Markers
-        </button>
-        <BpmTapper />
-      </div>
-
-      <div className="grid grid-cols-2 gap-8 mb-16">
-        {/* Segment A and B lists */}
-      </div>
-
-      <DurationCalculator />
-    </div>
-  );
-}
+                    className={`absolute top-0 ${t % 60 === 0 ? 'h-full bg-[#8EBBFF]' : 'h-4 bg-[#4A4D60]'} w-px`}
+                    style={{ left: `${t/600*100%
