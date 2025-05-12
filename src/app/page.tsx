@@ -1,6 +1,4 @@
-// src/app/page.tsx
 'use client';
-
 import TransformationMarkerApp from './TransformationMarkerApp';
 
 export default function Page() {
