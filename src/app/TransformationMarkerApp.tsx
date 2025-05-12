@@ -91,8 +91,8 @@ function DurationCalculator() {
         value={input}
         onChange={e => setInput(e.target.value)}
         onKeyDown={e => { if (e.key === 'Enter') { e.preventDefault(); calc(); } }}
-        placeholder="Paste copied time-segment text here"
-        className="w-full bg-[#2f3136] px-4 py-2 rounded text-sm text-[#d1d5db] mb-2"
+        placeholder="Paste copied time segment input here"
+        className="w-full bg-[#2f3136] px-4 py-2 rounded text-sm text-[#d1d5db] mb-2 resize-none"
         rows={1}
       />
 
@@ -222,104 +222,4 @@ export default function TransformationMarkerApp() {
                 <div
                   key={t}
                   className={`absolute top-0 ${t % 60 === 0 ? 'h-full bg-[#10a37f]' : 'h-4 bg-[#5a5f72]'} w-px`}
-                  style={{ left: `${(t / TIMELINE) * 100}%` }}
-                />
-              ))}
-
-              {/* minute labels */}
-              {ticks.filter(t => t % 60 === 0).map(t => (
-                <div
-                  key={`lbl${t}`}
-                  className="absolute text-xs text-[#10a37f] mt-1"
-                  style={{ left: `${(t / TIMELINE) * 100}%`, transform: 'translateX(-50%)', top: '2.25rem' }}
-                >
-                  {t / 60}
-                </div>
-              ))}
-
-              {/* markers */}
-              {markers.filter(m => m.track === track).map(m => (
-                <div
-                  key={m.id}
-                  className="absolute top-0 h-8 w-[2px] bg-[#FF6B6B] animate-fade-in"
-                  style={{ left: `${(m.time / TIMELINE) * 100}%` }}
-                />
-              ))}
-
-              {/* hover tooltip */}
-              {hoverTime !== null && hoverX !== null && (
-                <div
-                  className="absolute text-sm px-2 py-[2px] bg-[#202124] text-[#d1d5db] rounded shadow"
-                  style={{ left: `${hoverX}px`, transform: 'translateX(-50%)', top: '-1.25rem' }}
-                >
-                  {fmt(hoverTime)}
-                </div>
-              )}
-            </div>
-          </div>
-        </div>
-      ))}
-
-      {/* Global controls */}
-      <div className="mb-10 flex items-center gap-6">
-        <button
-          onClick={clearAll}
-          className="bg-[#202124] text-[#10a37f] border border-[#10a37f] px-4 py-2 rounded hover:bg-[#565c6c]"
-        >
-          Clear All Markers
-        </button>
-        <BpmTapper />
-      </div>
-
-      {/* Marker tables */}
-      <div className="grid grid-cols-2 gap-8 mb-16">
-        {(['Segment A', 'Segment B'] as const).map(col => (
-          <div key={col}>
-            <h3 className="text-lg font-medium mb-2">{col} Markers</h3>
-
-            <div className="space-y-4 max-h-96 overflow-y-auto pr-2 hide-scrollbar">
-              {markers
-                .filter(m => m.track === col)
-                .sort((a, b) => a.time - b.time)
-                .map(m => (
-                  <div key={m.id} className="flex flex-col gap-2 p-3 bg-[#2f3136] rounded-lg shadow-sm animate-fade-in">
-                    <div className="flex items-center gap-4">
-                      <span className="w-16 font-mono text-sm">{fmt(m.time)}</span>
-
-                      <select
-                        value={m.label}
-                        onChange={e => updateMarker(m.id, 'label', e.target.value)}
-                        className="appearance-none bg-[#2f3136] text-[#d1d5db] text-sm rounded-md px-3 py-2 border border-[#5a5f72] hover:border-[#10a37f] focus:ring-2 focus:ring-[#10a37f] focus:outline-none"
-                      >
-                        <option>Select transformation</option>
-                        {`Different Intro,New Drum Pattern,Different Instrument,Effects Added,Sample-Based Edit,Harmonic Variation,Voice Replaced by Instrument,Looped or Extended,Voiceover,Other,Different Ending/Outro,Same song - Different part`
-                          .split(',')
-                          .map(opt => <option key={opt}>{opt}</option>)}
-                      </select>
-
-                      <button
-                        onClick={() => deleteMarker(m.id)}
-                        className="bg-[#FF6B6B] text-white px-2 py-1 rounded hover:bg-[#D24C4C]"
-                      >
-                        Delete
-                      </button>
-                    </div>
-
-                    <input
-                      value={m.note}
-                      onChange={e => updateMarker(m.id, 'note', e.target.value)}
-                      placeholder="Add note…"
-                      className="text-sm bg-[#202124] border border-[#5a5f72] rounded px-3 py-1 text-[#d1d5db] placeholder:text-[#5a5f72]"
-                    />
-                  </div>
-                ))}
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* Duration calculator */}
-      <DurationCalculator />
-    </div>
-  );
-}
+                  style
