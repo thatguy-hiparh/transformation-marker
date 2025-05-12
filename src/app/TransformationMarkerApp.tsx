@@ -71,7 +71,6 @@ function DurationCalculator() {
     `${String(sec % 60).padStart(2, '0')}`;
 
   const calc = () => {
-    /* dot-all flag (/s) replaced with [\s\S]*? for older targets */
     const re =
       /video\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2})[\s\S]*?video\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2})[\s\S]*?audio\s*start(?:s)?\s*time[:\s]*(\d{2}:\d{2}:\d{2})[\s\S]*?audio\s*end\s*time[:\s]*(\d{2}:\d{2}:\d{2})/i;
 
@@ -183,7 +182,7 @@ export default function TransformationMarkerApp() {
 
   /* UI */
   return (
-    <div className="p-6 max-w-6xl mx-auto text-[#d1d5db] min-h-screen overflow-x-hidden">
+    <div className="select-none p-6 max-w-6xl mx-auto text-[#d1d5db] min-h-screen overflow-x-hidden">
 
       {/* Header */}
       <div className="flex justify-between items-center mb-6">
@@ -290,7 +289,7 @@ export default function TransformationMarkerApp() {
                       <select
                         value={m.label}
                         onChange={e => updateMarker(m.id, 'label', e.target.value)}
-                        className="appearance-none bg-[#2f3136] text-[#d1d5db] text-sm rounded-md px-3 py-2 border border-[#5a5f72] hover:border-[#10a37f] focus:ring-2 focus:ring-[#10a37f]"
+                        className="appearance-none bg-[#2f3136] text-[#d1d5db] text-sm rounded-md px-3 py-2 border border-[#5a5f72] hover:border-[#10a37f] focus:ring-2 focus:ring-[#10a37f] focus:outline-none"
                       >
                         <option>Select transformation</option>
                         {`Different Intro,New Drum Pattern,Different Instrument,Effects Added,Sample-Based Edit,Harmonic Variation,Voice Replaced by Instrument,Looped or Extended,Voiceover,Other,Different Ending/Outro,Same song - Different part`
